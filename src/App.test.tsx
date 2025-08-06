@@ -1,14 +1,8 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-
-jest.mock('date-fns', () => ({
-  format: () => 'Mon',
-  subDays: (date: Date) => date,
-  isToday: () => false
-}));
-jest.mock('date-fns/locale', () => ({ ptBR: {} }));
-
 import App from './App';
+
+jest.mock('date-fns/locale', () => ({ ptBR: undefined }));
 
 beforeEach(() => {
   localStorage.clear();
@@ -40,4 +34,31 @@ test('carrega hábitos e xp do usuário logado', async () => {
 
   expect(await screen.findByText('Ler')).toBeInTheDocument();
   expect(screen.getByText(/20 XP/)).toBeInTheDocument();
+});
+
+test('reseta streak quando hábito não foi completado no dia anterior', async () => {
+  jest.useFakeTimers();
+  jest.setSystemTime(new Date('2023-01-02'));
+
+  const habits = [
+    {
+      id: '1',
+      name: 'Correr',
+      streak: 3,
+      completed: false,
+      history: [{ date: '2023-01-01', completed: false }],
+      category: 'Saúde'
+    }
+  ];
+
+  localStorage.setItem('currentUser', JSON.stringify('user'));
+  localStorage.setItem('habits_user', JSON.stringify(habits));
+  localStorage.setItem('xp_user', JSON.stringify(0));
+
+  render(<App />);
+
+  expect(await screen.findByText('Correr')).toBeInTheDocument();
+  expect(screen.getByText('🔥 0 dias')).toBeInTheDocument();
+
+  jest.useRealTimers();
 });
