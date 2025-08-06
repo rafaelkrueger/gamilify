@@ -4,6 +4,7 @@ import { format, subDays, isToday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import './App.css';
 import { loadFromStorage, saveToStorage } from './utils/storage';
+import AuthModal from './AuthModal';
 
 type Habit = {
   id: string;
@@ -28,31 +29,29 @@ const CATEGORIES = ['Saúde', 'Aprendizado', 'Produtividade', 'Mental', 'Físico
 const generateHabitId = () => Math.random().toString(36).substring(2, 15);
 
 const App = () => {
-  const [habits, setHabits] = useState<Habit[]>(() =>
-    loadFromStorage('habits', [])
+  const [user, setUser] = useState<string | null>(() =>
+    loadFromStorage('currentUser', null)
   );
-
+  const [habits, setHabits] = useState<Habit[]>([]);
   const [dailyProgress, setDailyProgress] = useState<DailyProgress[]>([]);
-  const [xp, setXp] = useState(() => loadFromStorage('xp', 0));
+  const [xp, setXp] = useState(0);
   const [newHabit, setNewHabit] = useState({ name: '', category: CATEGORIES[0] });
   const [activeTab, setActiveTab] = useState('habits');
 
-  // Carregar dados iniciais
   useEffect(() => {
-    if (habits.length === 0) {
-      const initialHabits: Habit[] = [];
-      setHabits(initialHabits);
+    if (user) {
+      setHabits(loadFromStorage(`habits_${user}`, []));
+      setXp(loadFromStorage(`xp_${user}`, 0));
     }
+  }, [user]);
 
-    generateProgressData();
-  }, []);
-
-  // Persistir dados
   useEffect(() => {
-    saveToStorage('habits', habits);
-    saveToStorage('xp', xp);
-    generateProgressData();
-  }, [habits, xp]);
+    if (user) {
+      saveToStorage(`habits_${user}`, habits);
+      saveToStorage(`xp_${user}`, xp);
+      generateProgressData();
+    }
+  }, [habits, xp, user]);
 
   function generateHistory(streak: number, completed: boolean, todayCompleted = false) {
     const history = [];
@@ -147,6 +146,11 @@ const App = () => {
 
   const calculateLevel = () => Math.floor(xp / 100);
   const levelProgress = xp % 100;
+
+  const handleLogin = (username: string) => {
+    setUser(username);
+    saveToStorage('currentUser', username);
+  };
 
   return (
     <div className="app">
@@ -379,6 +383,7 @@ const App = () => {
       <footer className="app-footer">
         <p>Desenvolvido para crescimento pessoal • {format(new Date(), 'dd/MM/yyyy')}</p>
       </footer>
+      {!user && <AuthModal onLogin={handleLogin} />}
     </div>
   );
 };

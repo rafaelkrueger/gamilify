@@ -10,7 +10,19 @@ jest.mock('date-fns/locale', () => ({ ptBR: {} }));
 
 import App from './App';
 
-test('exibe título do progresso do usuário', () => {
+beforeEach(() => {
+  localStorage.clear();
+});
+
+test('mostra modal de autenticação quando usuário não está logado', () => {
+  render(<App />);
+  expect(screen.getByText(/Login/i)).toBeInTheDocument();
+});
+
+test('exibe título do progresso quando usuário está logado', () => {
+  localStorage.setItem('currentUser', JSON.stringify('user'));
+  localStorage.setItem('habits_user', JSON.stringify([]));
+  localStorage.setItem('xp_user', JSON.stringify(0));
   render(<App />);
   const heading = screen.getByText(/Meu Progresso/i);
   expect(heading).toBeInTheDocument();
