@@ -3,6 +3,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContai
 import { format, subDays, isToday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import './App.css';
+import { loadFromStorage, saveToStorage } from './utils/storage';
 
 type Habit = {
   id: string;
@@ -27,13 +28,12 @@ const CATEGORIES = ['Saúde', 'Aprendizado', 'Produtividade', 'Mental', 'Físico
 const generateHabitId = () => Math.random().toString(36).substring(2, 15);
 
 const App = () => {
-  const [habits, setHabits] = useState<Habit[]>(() => {
-    const saved = localStorage.getItem('habits');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [habits, setHabits] = useState<Habit[]>(() =>
+    loadFromStorage('habits', [])
+  );
 
   const [dailyProgress, setDailyProgress] = useState<DailyProgress[]>([]);
-  const [xp, setXp] = useState(() => parseInt(localStorage.getItem('xp') || '170'));
+  const [xp, setXp] = useState(() => loadFromStorage('xp', 170));
   const [newHabit, setNewHabit] = useState({ name: '', category: CATEGORIES[0] });
   const [activeTab, setActiveTab] = useState('habits');
 
@@ -74,8 +74,8 @@ const App = () => {
 
   // Persistir dados
   useEffect(() => {
-    localStorage.setItem('habits', JSON.stringify(habits));
-    localStorage.setItem('xp', xp.toString());
+    saveToStorage('habits', habits);
+    saveToStorage('xp', xp);
     generateProgressData();
   }, [habits, xp]);
 
