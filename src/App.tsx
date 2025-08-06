@@ -37,21 +37,25 @@ const App = () => {
   const [xp, setXp] = useState(0);
   const [newHabit, setNewHabit] = useState({ name: '', category: CATEGORIES[0] });
   const [activeTab, setActiveTab] = useState('habits');
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   useEffect(() => {
     if (user) {
-      setHabits(loadFromStorage(`habits_${user}`, []));
-      setXp(loadFromStorage(`xp_${user}`, 0));
+      const storedHabits = loadFromStorage(`habits_${user}`, []);
+      const storedXp = loadFromStorage(`xp_${user}`, 0);
+      setHabits(storedHabits);
+      setXp(storedXp);
+      setDataLoaded(true);
     }
   }, [user]);
 
   useEffect(() => {
-    if (user) {
+    if (user && dataLoaded) {
       saveToStorage(`habits_${user}`, habits);
       saveToStorage(`xp_${user}`, xp);
       generateProgressData();
     }
-  }, [habits, xp, user]);
+  }, [habits, xp, user, dataLoaded]);
 
   function generateHistory(streak: number, completed: boolean, todayCompleted = false) {
     const history = [];
@@ -148,6 +152,10 @@ const App = () => {
   const levelProgress = xp % 100;
 
   const handleLogin = (username: string) => {
+    setDataLoaded(false);
+    setHabits([]);
+    setDailyProgress([]);
+    setXp(0);
     setUser(username);
     saveToStorage('currentUser', username);
   };

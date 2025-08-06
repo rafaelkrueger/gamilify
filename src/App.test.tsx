@@ -27,3 +27,17 @@ test('exibe título do progresso quando usuário está logado', () => {
   const heading = screen.getByText(/Meu Progresso/i);
   expect(heading).toBeInTheDocument();
 });
+
+test('carrega hábitos e xp do usuário logado', async () => {
+  const habits = [
+    { id: '1', name: 'Ler', streak: 2, completed: false, history: [], category: 'Saúde' }
+  ];
+  localStorage.setItem('currentUser', JSON.stringify('user'));
+  localStorage.setItem('habits_user', JSON.stringify(habits));
+  localStorage.setItem('xp_user', JSON.stringify(20));
+
+  render(<App />);
+
+  expect(await screen.findByText('Ler')).toBeInTheDocument();
+  expect(screen.getByText(/20 XP/)).toBeInTheDocument();
+});
