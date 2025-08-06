@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { loadFromStorage, saveToStorage } from './utils/storage';
+import { loadFromStorage, saveToStorage } from './utils/storage.ts';
 
 type AuthModalProps = {
   onLogin: (username: string) => void;

@@ -3,8 +3,8 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContai
 import { format, subDays, isToday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import './App.css';
-import { loadFromStorage, saveToStorage } from './utils/storage';
-import AuthModal from './AuthModal';
+import { loadFromStorage, saveToStorage } from './utils/storage.ts';
+import AuthModal from './AuthModal.tsx';
 
 type Habit = {
   id: string;
