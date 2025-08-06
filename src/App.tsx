@@ -33,39 +33,14 @@ const App = () => {
   );
 
   const [dailyProgress, setDailyProgress] = useState<DailyProgress[]>([]);
-  const [xp, setXp] = useState(() => loadFromStorage('xp', 170));
+  const [xp, setXp] = useState(() => loadFromStorage('xp', 0));
   const [newHabit, setNewHabit] = useState({ name: '', category: CATEGORIES[0] });
   const [activeTab, setActiveTab] = useState('habits');
 
   // Carregar dados iniciais
   useEffect(() => {
     if (habits.length === 0) {
-      const initialHabits: Habit[] = [
-        {
-          id: generateHabitId(),
-          name: '30 min de leitura',
-          streak: 3,
-          completed: false,
-          category: 'Aprendizado',
-          history: generateHistory(3, true)
-        },
-        {
-          id: generateHabitId(),
-          name: 'Estudo de IA',
-          streak: 5,
-          completed: false,
-          category: 'Aprendizado',
-          history: generateHistory(5, true)
-        },
-        {
-          id: generateHabitId(),
-          name: 'Caminhada 15min',
-          streak: 10,
-          completed: true,
-          category: 'Saúde',
-          history: generateHistory(10, true, true)
-        },
-      ];
+      const initialHabits: Habit[] = [];
       setHabits(initialHabits);
     }
 
