@@ -57,6 +57,32 @@ const App = () => {
     }
   }, [habits, xp, user, dataLoaded]);
 
+  useEffect(() => {
+    if (dataLoaded) {
+      const today = format(new Date(), 'yyyy-MM-dd');
+      const yesterday = format(subDays(new Date(), 1), 'yyyy-MM-dd');
+
+      setHabits(prev =>
+        prev.map(habit => {
+          const lastEntry = habit.history[habit.history.length - 1];
+          if (lastEntry?.date === today) {
+            return { ...habit, completed: lastEntry.completed };
+          }
+
+          const missedYesterday =
+            !lastEntry || lastEntry.date !== yesterday || !lastEntry.completed;
+
+          return {
+            ...habit,
+            streak: missedYesterday ? 0 : habit.streak,
+            completed: false,
+            history: [...habit.history, { date: today, completed: false }]
+          };
+        })
+      );
+    }
+  }, [dataLoaded]);
+
   function generateHistory(streak: number, completed: boolean, todayCompleted = false) {
     const history = [];
     const today = new Date();
